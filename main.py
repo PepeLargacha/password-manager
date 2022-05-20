@@ -30,35 +30,34 @@ def generate_passwords():
 # ---------------------------- FIND PASSWORD ------------------------------- #
 def find_password():
     try:
-        file = open('data.json')
+        with open('data.json') as file:
+            data = json.load(file)
     except FileNotFoundError:
         messagebox.showerror(title='DataBase not Found', message="There is no information to be found.")
     else:
-        data = json.load(file)
         to_search = web_field.get().title()
-        try:
-            user = data[to_search]['email']
-            password = data[to_search]['password']
-        except KeyError:
+        if not (to_search in data):
             messagebox.showinfo(title='Site not Found', message='Check if the site name is correct.')
         else:
+            user = data[to_search]['email']
+            password = data[to_search]['password']
             hide_password = messagebox.askyesnocancel(title='Show info?', message='Do you want to show Password?',
                                                       detail='Your password will be copied to clipboard')
-            if hide_password == None:
+            if hide_password is None:
                 pass
-            elif hide_password == True:
+
+            elif hide_password:
                 pyperclip.copy(password)
                 email_field.insert(0, user)
-                messagebox.showinfo(title=f'{to_search} informations.', message=f"Login: {user}\n"
+                messagebox.showinfo(title=f'{to_search}', message=f"Login: {user}\n"
                                                                                 f"Password: {password}\n"
                                                                                 f"\n Password copied to clipboard")
-            elif hide_password == False:
+
+            elif not hide_password:
                 pyperclip.copy(password)
                 email_field.insert(0, user)
                 messagebox.showinfo(title=f'{to_search} informations.', message=f"Login: {user}\n"
                                                                                 f"Password: Copied to clipboard")
-    finally:
-        file.close()
 
 
 # ---------------------------- SAVE PASSWORD ------------------------------- #
@@ -134,6 +133,5 @@ pass_field.grid(row=3, column=1)
 search.grid(row=1, column=2)
 generate_pass_bt.grid(row=3, column=2)
 add_bt.grid(row=4, column=1, columnspan=2)
-
 
 gui.mainloop()
